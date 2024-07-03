@@ -32,69 +32,28 @@ class Mediator:
 
     def updateArduinoVals(self):
         #get ALL Arduino Values
-        '''''
-
-        #LDR Value
-       # LDR = arduino.getLDR()   ##this func returns the iteration num
-        #speed = arduino.getSpeed()
-
-        
-        #battery reading
-
-        battery = arduino.getBatteryCapacity()
-        batteryStr = f"{battery}%"
-        batteryPercentageTxt = StringProperty(batteryStr)  ##gets sent to GUI
-
-        if battery < 25:
-            print("Low battery, head to charging station")
-            # battery img source change
-'''''
-        ##############################################
-
         #Speed Reading
-        speed = self.arduino.getSpeed()
-        self.speedStr = f"{speed} KM/H"
-
-        volts = self.arduino.getVoltage()
-        self.voltsStr = f"{volts} V"
-
-        current = self.arduino.getVoltage()
-        self.currentStr = f"{current} A"
-
-        battery = self.arduino.getBatteryCapacity()
-        self.batteryStr = f"{battery} %"
-
-        rangeLeft = self.arduino.getRange()
-        self.rangeLeftStr = f"{rangeLeft} KM"
-
-        distanceTravelled = self.arduino.getDistanceTravelled()
-        self.distanceTravelledStr = f"{distanceTravelled} KM"
 
 
+        #self.getTemp()
+        pass
+        #self.getSensor("temperature", self.arduino.getPIN(self.arduino.speed))
 
-        #smoke sensor
-        self.smoke = self.arduino.getSmoke()
-
-        #door
-        self.doorOpen = self.arduino.getRightDoorSensor() | self.arduino.getLeftDoorSensor()
-        #self.doorOpen = self.arduino.getRightDoorSensor()
-        #trunk
-        self.trunkOpen = self.arduino.getTrunkSensor()
-
-        self.seatBelt = self.arduino.getSeatBeltSensor()
-
-        self.sitting = self.arduino.getSeatSensor()
-       # self.isNightTime = self.arduino.getLDR()
-        self.stWheel = self.arduino.getStWheel()
-
+    def getSensor(self,PIN):
+        sensor = self.arduino.getAnalogueReading(PIN)
+        sensorStr = f"{sensor}"
+        return sensorStr
 
     def getTemp(self):
-        temp = self.arduino.getAnalogueReading("temperature",self.arduino.tempPIN)
-        self.tempStr = f"{temp} Cvbnm"
+        temp = self.arduino.getAnalogueReading(self.arduino.getPIN(self.arduino.temperature))
+        self.tempStr = f"{temp} C"
         return self.tempStr
 
     def getSpeed(self):
+        speed = self.arduino.getSpeed()
+        self.speedStr = f"{speed} KM/H"
         return self.speedStr
+
     def getVoltage(self):
         return self.voltsStr
     def getCurrent(self):

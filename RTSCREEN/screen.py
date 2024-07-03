@@ -1,5 +1,6 @@
 import time
 from threading import Thread
+import multiprocessing as mp
 import kivy
 from kivy.app import App
 from kivy.lang import Builder
@@ -73,8 +74,10 @@ class runApp(MDApp):
     def StartGetArduinoValues(self):
         Thread(target=self.getArduinoValues).start()
     def getArduinoValues(self):
+        print("Arduino Values Function")
         while self.running:
-            self.mediator.updateArduinoVals()
+            print("While loop")
+            #self.mediator.updateArduinoVals()
             print('running')# updating value
             Clock.schedule_once(self.updateText, 0)
             time.sleep(0.25)
@@ -87,54 +90,36 @@ class runApp(MDApp):
         else:
             ID.source = srcOff
     def updateText(self, dt):
-        #get values using mediator
-        print("speedTxt")
-        speedTxt = self.mediator.getTemp() # get updated value
 
-        #volts from potentiometer then bbattery from volts, getvoltage and getrange and batt in arduino file so call getvolts them in get battery and then getbattery in range left
-        #voltTxt = self.mediator.getVoltage()
-        #currentTxt = self.mediator.getCurrent()
-        #distanceTxt = self.mediator.getDistanceTravelled()
-        #batteryTxt = self.mediator.getBatteryCapacity()
-        #rangeTxt = self.mediator.getRange()
-        #smokeValue = self.mediator.getSmoke()
-        #doorOpenValue = self.mediator.getDoorOpen()
-        #trunkOpenValue = self.mediator.getTrunkOpen()
-        seatBeltValue = self.mediator.getSeatBelt()
-        sittingValue = self.mediator.getSitting()
-        #timeValue = self.mediator.getTime() #day or nighttime
-        stWheelValue = self.mediator.getStWheel()
+        try:
+            speedTxt = self.mediator.getSpeed() # get updated value
+        except Exception as e:
+            print(f"Error:{e}")
+
+        try:
+            batteryTxt = self.mediator.getTemp() # get updated value
+        except Exception as e:
+            print(f"Error:{e}")
+
+
+
 
         # Access the label in runApp.kv using its ID
         # Defined here bc. labels have to be accessed after screen rendering
-        #rangeID = self.run_app_screen.ids.rangeID  # Replace with actual ID
         speedID = self.run_app_screen.ids.speedID  # Replace with actual ID
-        #batteryID = self.run_app_screen.ids.batteryID  # Replace with actual ID
-        #distanceTravelledID = self.run_app_screen.ids.distanceTravelledID
-        #voltsID = self.run_app_screen.ids.voltsID
-        #currentID = self.run_app_screen.ids.currentID
-        #smokeID = self.run_app_screen.ids.smoke
-        #doorID = self.run_app_screen.ids.door
-        seatID = self.run_app_screen.ids.seat
-        #moonID = self.run_app_screen.ids.moon
-        #trunkID = self.run_app_screen.ids.trunk
-        stWheelID = self.run_app_screen.ids.stWheel
-        seatBeltID = self.run_app_screen.ids.seatBelt
+        batteryID = self.run_app_screen.ids.batteryID  # Replace with actual ID
+
 
         # Set label text
-        #rangeID.text = rangeTxt
         speedID.text = speedTxt
-        #batteryID.text = batteryTxt
-        #currentID.text = currentTxt
-        #voltsID.text = voltTxt
-        #distanceTravelledID.text = distanceTxt
+        batteryID.text = batteryTxt
 
         #self.toggleIndicators(smokeID,smokeValue,smokeOffSrc,smokeOnSrc)
         #self.toggleIndicators(doorID,doorOpenValue,doorSrc,doorOpenSrc)
         #self.toggleIndicators(trunkID,trunkOpenValue,trunkSrc,trunkOpenSrc)
-        self.toggleIndicators(seatID,sittingValue,seatSrc,seatOnSrc)
-        self.toggleIndicators(seatBeltID,seatBeltValue,seatBeltSrc,seatBeltOnSrc)
-        self.toggleIndicators(stWheelID,stWheelValue,stWheelSrc,stWheelOnSrc)
+        #self.toggleIndicators(seatID,sittingValue,seatSrc,seatOnSrc)
+        #self.toggleIndicators(seatBeltID,seatBeltValue,seatBeltSrc,seatBeltOnSrc)
+        #self.toggleIndicators(stWheelID,stWheelValue,stWheelSrc,stWheelOnSrc)
         #self.toggleIndicators(moonID,timeValue,seatSrc,seatOnSrc) #sun/moon
 
 
@@ -142,4 +127,6 @@ class runApp(MDApp):
         self.running = False  # Stop the infinite loop
 
 
-runApp().run()
+
+if __name__ == '__main__':
+    runApp().run()
