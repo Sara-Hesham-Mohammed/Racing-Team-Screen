@@ -1,0 +1,34 @@
+<CircularProgressBar>
+    canvas.before:
+        Color:
+            rgba: root.bar_color + [0.3]
+        Line:
+            width: root.bar_width
+            ellipse: (self.x,self.y,self.width,self.height,0,360)
+
+    canvas.after:
+        Color:
+            rgb: root.bar_color
+        Line:
+            width: root.bar_width
+            ellipse: (self.x,self.y,self.width,self.height,0,root.set_value*3.6)
+
+    MDLabel:
+        text: root.text
+        font_size: "40sp"
+        pos_hint: {"center_x": .5, "center_y": .5}
+        halign: "center"
+        color: root.bar_color
+
+MDFloatLayout:
+    CircularProgressBar:
+        size_hint: None, None
+        size: 200, 200
+        pos_hint: {"center_x": .3, "center_y": .5}
+        value: 100
+
+    CircularProgressBar:
+        size_hint: None, None
+        size: 200, 200
+        pos_hint: {"center_x": .8, "center_y": .5}
+        value: 100
