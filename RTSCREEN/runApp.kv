@@ -3,10 +3,13 @@ MDScreen:
     padding: 10
     md_bg_color: 0, 0, 0, 1
     name:"runApp"
-    Image:
-        source:'gradient.png'
-        allow_stretch: True
-        keep_ratio: False
+
+    MDFloatLayout:
+
+        Image:
+            source:'Images/bckg.jpg'
+            allow_stretch: True
+            keep_ratio: True
 
 
     MDFloatLayout:
@@ -16,131 +19,126 @@ MDScreen:
             source: 'Images/seatBelt.png'
             size_hint: None, None
             size: 40, 40
-            pos_hint: {'top':0.9, 'x':0.135}
+            pos_hint: {'top':0.945, 'x':0.135}
         Image:
             id: door
             source: 'Images/door.png'
             size_hint: None, None
             size: 50, 40
-            pos_hint: {'top':0.9, 'x':0.205}
+            pos_hint: {'top':0.945, 'x':0.205}
         Image:
             id: highBeam
             source: 'Images/highBeam.png'
             size_hint: None, None
             size: 40, 40
-            pos_hint: {'top':0.9, 'x':0.275}
+            pos_hint: {'top':0.945, 'x':0.275}
         Image:
             id: lowBeam
             source: 'Images/lowBeam.png'
             size_hint: None, None
             size: 40, 40
-            pos_hint: {'top':0.9, 'x':0.345}
+            pos_hint: {'top':0.945, 'x':0.345}
         Image:
             id: battery
             source: 'Images/battery.png'
             size_hint: None, None
-            size: 50, 50
-            pos_hint: {'top':0.9, 'x':0.415}
+            size: 55, 55
+            pos_hint: {'top':0.950, 'x':0.415}
+        Image:
+            id: temp
+            source: 'Images/temp.png'
+            size_hint: None, None
+            size: 55, 55
+            pos_hint: {'top':0.950, 'x':0.485}
         Image:
             id: volts
             source: 'Images/volts.png'
             size_hint: None, None
             size: 50, 50
-            pos_hint: {'top':0.8, 'x':0.455}
+            pos_hint: {'top':0.7, 'x':0.455}
         Label:
             id: voltsID
             text: '$$VOLTAGE$$ V'
             font_size: "15sp"
-            pos_hint: {'top':1.285, 'x':0.03}
+            pos_hint: {'top':1.175, 'x':0.03}
         Label:
             id: currentID
             text: '$$CURRENT$$ A'
             font_size: "15sp"
-            pos_hint: {'top':1.265, 'x':0.03}
-
+            pos_hint: {'top':1.145, 'x':0.03}
         Image:
             id: smoke
             source: 'Images/smoke.png'
             size_hint: None, None
             size: 50, 50
-            pos_hint: {'top':0.9, 'x':0.555}
+            pos_hint: {'top':0.945, 'x':0.555}
         Image:
             id: stWheel
             source: 'Images/stWheel.png'
             size_hint: None, None
             size: 40, 40
-            pos_hint: {'top':0.9, 'x':0.625}
+            pos_hint: {'top':0.945, 'x':0.625}
         Image:
             id: seat
             source: 'Images/seat.png'
             size_hint: None, None
             size: 90, 90
-            pos_hint: {'top':0.93, 'x':0.675}
+            pos_hint: {'top':0.976, 'x':0.675}
         Image:
             id: sun
             source: 'Images/sun.png'
             size_hint: None, None
             size: 50, 50
-            pos_hint: {'top':0.9, 'x':0.765}
+            pos_hint: {'top':0.945, 'x':0.765}
         Image:
             id: moon
             source: 'Images/moon.png'
             size_hint: None, None
-            size: 50, 50
-            pos_hint: {'top':0.9, 'x':0.835}
+            size: 45, 45
+            pos_hint: {'top':0.945, 'x':0.835}
 
 
 
     MDFloatLayout:
-
         Image:
-            source: 'Images/gauge.png'
-            size_hint: 1, 1
-            size: 400, 400
-            pos_hint: {"center_x": .8,"center_y": .5}
+            source: 'Images/left.png'
+            size_hint: None, None
+            size: 65, 65
+            pos_hint: {"center_x":0.39, "center_y": 0.67}
+        Image:
+            source: 'Images/right.png'
+            size_hint: None, None
+            size: 65, 65
+            pos_hint: {"center_x":0.61, "center_y": 0.67}
         Label:
             id: batteryID
             text: 'BATTERY %'
             font_size: "35sp"
             size: self.texture_size
-            pos_hint: {"center_x": .8,"center_y": .5}
+            pos_hint: {"center_x": .8,"center_y": .525}
         Image:
-            source: 'Images/middle.png'
-            pos_hint: {'center_y': 0.5}
-        Image:
-            source: 'Images/gauge.png'
-            size_hint: 1, 1
-            size: 400, 400
-            pos_hint: {"center_x": .2,"center_y": .5}
+            source: "Images/middle.png"
+            pos_hint: {"center_x":0.5, "center_y": 0.45}
+            size_hint: None,None
+            size: 495,495
         Label:
             id: speedID
-            text: '$$SPEED$$ km/h'
+            text: '$$SPEED$$ KM/H'
             font_size: "35sp"
             size: self.texture_size
-            pos_hint: {"center_x": .2, "center_y": .5}
+            pos_hint: {"center_x": .2, "center_y": .525}
 
 
     MDFloatLayout:
 
-
-        Image:
-            source: 'Images/left.png'
-            size_hint: None, None
-            size: 65, 65
-
-        Image:
-            source: 'Images/right.png'
-            size_hint: None, None
-            size: 65, 65
-            pos_hint: {"x": .96, "bottom": 1}
         Label:
             id: rangeID
-            text: '$$RANGE$$ km'
-            font_size: "40sp"
+            text: 'Range: $$RANGE$$ KM'
+            font_size: "30sp"
             pos_hint: {"center_x": 0.5, "y": -0.35}
         Label:
             id: distanceTravelledID
-            text: '$$DISTANCETRAVELLED$$ km'
-            font_size: "40sp"
-            pos_hint: {"center_x": 0.5, "y": -0.25}
+            text: 'Distance Travelled: $$DISTANCETRAVELLED$$ KM'
+            font_size: "30sp"
+            pos_hint: {"center_x": 0.5, "y": -0.45}
 
