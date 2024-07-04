@@ -8,7 +8,7 @@ class Arduino:
 
     iterationNum = 0
     #initialize board and COM Number\
-    board = ArduinoMega('COM10')
+    board = ArduinoMega('/dev/cu.IC-HB1129-SerialPort')
 
     ########### DIGITAL PINS ##############
     #initialize pins(digital/pwm/analogue) and if they're input or output

@@ -51,7 +51,7 @@ class runApp(MDApp):
 
     def changeGUItext(self,sensorName):
         try:
-            textInit = self.mediator.getSensor(f'{sensorName}') # get updated value
+            textInit = self.mediator.getSensor(f'{sensorName}') 
             temp =float(textInit)*100
             text = str(temp)
             text = f"{temp:.2f}"
