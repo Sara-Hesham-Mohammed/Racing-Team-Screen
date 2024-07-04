@@ -30,10 +30,10 @@ class Mediator:
 
     def getSensor(self,sensorName):
         sensor = getattr(self.arduino, sensorName, None)
-        print(sensor)
         PIN = self.arduino.getPIN(sensor)
         sensorVal = self.arduino.getAnaloguePinReading(PIN)
         sensorStr = f"{sensorVal}"
+        print(f"Sensor:{sensor}. Sensor String:{sensorStr}. Sensor Value:{sensorVal}")
         return sensorStr
 
 

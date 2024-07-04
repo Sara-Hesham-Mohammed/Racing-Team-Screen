@@ -8,37 +8,12 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from MediatorModule import Mediator
 
-smokeOffSrc = 'Images/smoke.png'
-smokeOnSrc = 'Images/smokeRed.png'
-
-doorSrc = 'Images/door.png'
-doorOpenSrc = 'Images/doorsRed.png'
-
-seatSrc = 'Images/seat.png'
-seatOnSrc = 'Images/seatBlue.png'
-
-seatBeltSrc = 'Images/seatBelt.png'
-seatBeltOnSrc = 'Images/seatBeltRed.png'
-
-daytimeSrc = 'Images/sun.png'
-daytimeOnSrc = 'Images/sunBlue.png'
-
-nighttimeSrc = 'Images/moon.png'
-nighttimeOnSrc = 'Images/moonBlue.png'
-
-stWheelSrc = 'Images/stWheel.png'
-stWheelOnSrc = 'Images/stWheelRed.png'
-
 class runApp(MDApp):
     Window.size = (1280, 720)
     screen_manager = ScreenManager(transition=SlideTransition(duration=1.5))
     # Load splashScreen.kv and runApp.kv files
     splash_screen = None
     run_app_screen = None
-    #src must be in vars, slows down the function otherwise
-
-
-
     mediator = Mediator()
 
     def __init__(self, **kwargs):
@@ -87,33 +62,31 @@ class runApp(MDApp):
         id.text = text
 
 
-    def toggleIndicators(self, id, getterFunc, srcOff, srcOn):
-        ID = id
-        Value = getterFunc
-        if (Value):
-            ID.source = srcOn
+    def changeGUIicons(self,sensorName):
+        id = self.run_app_screen.ids[f"{sensorName}" + "ID"]
+        value = self.mediator.getSensor(f'{sensorName}')
+        print(f"Smoke Value:{value}")
+        onSrc=f'Images/{sensorName}Red.png'
+        offSrc =f'Images/{sensorName}.png'
+        if (value):
+            id.source = onSrc
         else:
-            ID.source = srcOff
+            id.source = offSrc
 
     def updateText(self, dt):
-        self.changeGUItext('speed')
+        try:
+            self.changeGUItext('speed')
+        except Exception as e:
+            print(f"Error:{e}. Couldn't get speed reading")
 
+        try:
+            self.changeGUItext('temperature')
+        except Exception as e:
+            print(f"Error:{e}. Couldn't get temperature reading")
 
-
-
-        #self.toggleIndicators(smokeID,smokeValue,smokeOffSrc,smokeOnSrc)
-        #self.toggleIndicators(doorID,doorOpenValue,doorSrc,doorOpenSrc)
-        #self.toggleIndicators(trunkID,trunkOpenValue,trunkSrc,trunkOpenSrc)
-        #self.toggleIndicators(seatID,sittingValue,seatSrc,seatOnSrc)
-        #self.toggleIndicators(seatBeltID,seatBeltValue,seatBeltSrc,seatBeltOnSrc)
-        #self.toggleIndicators(stWheelID,stWheelValue,stWheelSrc,stWheelOnSrc)
-        #self.toggleIndicators(moonID,timeValue,seatSrc,seatOnSrc) #sun/moon
-
-
+        self.changeGUIicons('smoke')
     def stop(self):
         self.running = False  # Stop the infinite loop
-
-
 
 if __name__ == '__main__':
     with Pool(processes=4) as pool:

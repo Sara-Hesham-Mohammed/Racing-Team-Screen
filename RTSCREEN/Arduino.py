@@ -17,7 +17,7 @@ class Arduino:
     stWheel = board.get_pin('d:2:i')
 
     seatSensor = board.get_pin('d:5:i')
-    smokeSensor = board.get_pin('d:6:i')
+    smoke = board.get_pin('d:8:i')
 
 
     # lights
@@ -27,7 +27,7 @@ class Arduino:
     leftBlinker = board.get_pin('d:3:i')
     rightBlinker = board.get_pin('d:4:i')
 
-    lowBeam = board.get_pin('d:8:i')
+    #lowBeam = board.get_pin('d:8:i')
 
     # doors / trunk / hood
     leftDoorSensor = board.get_pin('d:9:i')
@@ -42,7 +42,7 @@ class Arduino:
     ########### ANALOGUE PINS, check if they all need to be input or output###############
     ldr = board.get_pin('a:0:i')
 
-    speed = board.get_pin('d:24:i') #initialized to random number for now
+    speed = board.get_pin('d:34:i') #initialized to random number for now
 
     temperature = board.get_pin('a:2:i')  # initialized to random number for now
 
@@ -130,10 +130,13 @@ class Arduino:
        tempVal =  self.getAnaloguePinReading(self.getPIN(self.temperature))
        return tempVal
 
+    def getAnalogue(self):
+        pass
+
     ######################################### DIGITAL GETTER FUNCTIONS ###################################
 
 
-    #general getter
+    #This reads from the Pins
     def getAnaloguePinReading(self,sensorPIN):
         self.board.analog[sensorPIN].enable_reporting()
         reading = self.board.analog[sensorPIN].read()
