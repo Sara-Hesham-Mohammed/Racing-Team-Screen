@@ -44,7 +44,6 @@ class runApp(MDApp):
     def __init__(self, **kwargs):
         super(runApp, self).__init__(**kwargs)
         self.running = True  # Flag to control the loop
-        print("speedTxt")
         self.StartGetArduinoValues()
         self.splash_screen = Builder.load_file("splashScreen.kv")
         self.run_app_screen = Builder.load_file("runApp.kv")
@@ -71,11 +70,7 @@ class runApp(MDApp):
     def StartGetArduinoValues(self):
         Thread(target=self.getArduinoValues).start()
     def getArduinoValues(self):
-        print("Arduino Values Function")
         while self.running:
-            print("While loop")
-            #self.mediator.updateArduinoVals()
-            print('running')# updating value
             Clock.schedule_once(self.updateText, 0)
             time.sleep(0.25)
 
@@ -86,31 +81,21 @@ class runApp(MDApp):
             ID.source = srcOn
         else:
             ID.source = srcOff
+
+    def changeGUItext(self,sensorName):
+        try:
+            text = self.mediator.getSensor(f'{sensorName}') # get updated value
+        except Exception as e:
+            print(f"Error:{e}")
+
+        id = self.run_app_screen.ids[f"{sensorName}" + "ID"]
+        id.text = text
+
     def updateText(self, dt):
-
-
-        try:
-            speedTxt = self.mediator.getSensor('speed') # get updated value
-        except Exception as e:
-            print(f"Error:{e}")
-
-        try:
-            batteryTxt = self.mediator.getSensor('temperature') # get updated value
-        except Exception as e:
-            print(f"Error:{e}")
+        self.changeGUItext('speed')
 
 
 
-
-        # Access the label in runApp.kv using its ID
-        # Defined here bc. labels have to be accessed after screen rendering
-        speedID = self.run_app_screen.ids.speedID  # Replace with actual ID
-        batteryID = self.run_app_screen.ids["battery"+"ID"]  # Replace with actual ID
-
-
-        # Set label text
-        speedID.text = speedTxt
-        batteryID.text = batteryTxt
 
         #self.toggleIndicators(smokeID,smokeValue,smokeOffSrc,smokeOnSrc)
         #self.toggleIndicators(doorID,doorOpenValue,doorSrc,doorOpenSrc)
