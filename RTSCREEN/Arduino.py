@@ -75,7 +75,7 @@ class Arduino:
     ######################################### ANALOGUE GETTER FUNCTIONS ###################################
 
     def getLDR(self):
-        ldrValue = self.getAnalogueReading(self.getPIN(self.ldr))*1023 #intensity
+        ldrValue = self.getAnaloguePinReading(self.getPIN(self.ldr))*1023 #intensity
 
         print(f"LDR Intensity: {ldrValue}")
         if ldrValue > 100:#closer to 1023 is darkness
@@ -88,7 +88,7 @@ class Arduino:
             print("Light out, LED OFF")
     def getSpeed(self):
         # multiply by a factor
-        speedValue = self.getAnalogueReading(self.getPIN(self.speed))
+        speedValue = self.getAnaloguePinReading(self.getPIN(self.speed))
         return speedValue
 
     def getBatteryCapacity(self):
@@ -98,7 +98,7 @@ class Arduino:
         return batteryPercent
 
     def getVoltage(self):
-        voltValue = self.getAnalogueReading(self.getPIN(self.voltage))
+        voltValue = self.getAnaloguePinReading(self.getPIN(self.voltage))
         return voltValue
 
     def getDistanceTravelled(self):
@@ -122,15 +122,15 @@ class Arduino:
 
     def getCurrent(self):
         # speed - needs to be multiplied by a factor cause the read() is from 0.0 to 1.0
-        currentValue = self.getAnalogueReading(self.getPIN(self.current))
+        currentValue = self.getAnaloguePinReading(self.getPIN(self.current))
         return currentValue
 
     def getOilLevel(self):
-        oilLvlVaL = self.getAnalogueReading(self.getPIN(self.oilLevel))
+        oilLvlVaL = self.getAnaloguePinReading(self.getPIN(self.oilLevel))
         return oilLvlVaL
 
     def getTemperature(self):
-       tempVal =  self.getAnalogueReading(self.getPIN(self.temperature))
+       tempVal =  self.getAnaloguePinReading(self.getPIN(self.temperature))
        return tempVal
 
     ######################################### DIGITAL GETTER FUNCTIONS ###################################

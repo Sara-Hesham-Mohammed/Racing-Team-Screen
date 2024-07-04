@@ -1,12 +1,9 @@
 import time
 from threading import Thread
-import multiprocessing as mp
-import kivy
-from kivy.app import App
+from multiprocessing import Process, Queue, Pool
 from kivy.lang import Builder
-from kivy.properties import ObjectProperty, StringProperty
 from kivymd.app import MDApp
-from kivy.uix.screenmanager import ScreenManager, FadeTransition, SlideTransition, Screen, SwapTransition
+from kivy.uix.screenmanager import ScreenManager, SlideTransition
 from kivy.clock import Clock
 from kivy.core.window import Window
 from MediatorModule import Mediator
@@ -91,13 +88,14 @@ class runApp(MDApp):
             ID.source = srcOff
     def updateText(self, dt):
 
+
         try:
-            speedTxt = self.mediator.getSpeed() # get updated value
+            speedTxt = self.mediator.getSensor('speed') # get updated value
         except Exception as e:
             print(f"Error:{e}")
 
         try:
-            batteryTxt = self.mediator.getTemp() # get updated value
+            batteryTxt = self.mediator.getSensor('temperature') # get updated value
         except Exception as e:
             print(f"Error:{e}")
 
@@ -107,7 +105,7 @@ class runApp(MDApp):
         # Access the label in runApp.kv using its ID
         # Defined here bc. labels have to be accessed after screen rendering
         speedID = self.run_app_screen.ids.speedID  # Replace with actual ID
-        batteryID = self.run_app_screen.ids.batteryID  # Replace with actual ID
+        batteryID = self.run_app_screen.ids["battery"+"ID"]  # Replace with actual ID
 
 
         # Set label text
@@ -129,4 +127,6 @@ class runApp(MDApp):
 
 
 if __name__ == '__main__':
+    with Pool(processes=4) as pool:
+        pass
     runApp().run()
