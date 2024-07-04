@@ -10,13 +10,10 @@ class Arduino:
     #initialize board and COM Number\
     board = ArduinoMega('COM10')
 
-    ########### DIGITAL PINS, check if they all need to be input or output###############
+    ########### DIGITAL PINS ##############
     #initialize pins(digital/pwm/analogue) and if they're input or output
-    #led = board.get_pin('d::o')
-    #ledPIN =
 
-    # indicators
-    # 1st  2 digital pins are for RX TX comms, so we start from pin 3
+    # 0 and 1 digital pins are for RX TX, so we start from pin 2
     stWheel = board.get_pin('d:2:i')
 
     seatSensor = board.get_pin('d:5:i')
@@ -45,7 +42,7 @@ class Arduino:
     ########### ANALOGUE PINS, check if they all need to be input or output###############
     ldr = board.get_pin('a:0:i')
 
-    speed = board.get_pin('a:1:i') #initialized to random number for now
+    speed = board.get_pin('d:24:i') #initialized to random number for now
 
     temperature = board.get_pin('a:2:i')  # initialized to random number for now
 

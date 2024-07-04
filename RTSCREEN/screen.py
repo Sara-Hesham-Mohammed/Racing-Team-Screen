@@ -44,7 +44,7 @@ class runApp(MDApp):
     def __init__(self, **kwargs):
         super(runApp, self).__init__(**kwargs)
         self.running = True  # Flag to control the loop
-        self.StartGetArduinoValues()
+        self.StartArduinoThread()
         self.splash_screen = Builder.load_file("splashScreen.kv")
         self.run_app_screen = Builder.load_file("runApp.kv")
 
@@ -67,12 +67,25 @@ class runApp(MDApp):
     def change_screen(self, dt):
         self.screen_manager.current = "runApp"
 
-    def StartGetArduinoValues(self):
+    def StartArduinoThread(self):
         Thread(target=self.getArduinoValues).start()
     def getArduinoValues(self):
         while self.running:
             Clock.schedule_once(self.updateText, 0)
             time.sleep(0.25)
+
+    def changeGUItext(self,sensorName):
+        try:
+            textInit = self.mediator.getSensor(f'{sensorName}') # get updated value
+            temp =float(textInit)*100
+            text = str(temp)
+            text = f"{temp:.2f}"
+        except Exception as e:
+            print(f"Error:{e}")
+
+        id = self.run_app_screen.ids[f"{sensorName}" + "ID"]
+        id.text = text
+
 
     def toggleIndicators(self, id, getterFunc, srcOff, srcOn):
         ID = id
@@ -81,15 +94,6 @@ class runApp(MDApp):
             ID.source = srcOn
         else:
             ID.source = srcOff
-
-    def changeGUItext(self,sensorName):
-        try:
-            text = self.mediator.getSensor(f'{sensorName}') # get updated value
-        except Exception as e:
-            print(f"Error:{e}")
-
-        id = self.run_app_screen.ids[f"{sensorName}" + "ID"]
-        id.text = text
 
     def updateText(self, dt):
         self.changeGUItext('speed')
