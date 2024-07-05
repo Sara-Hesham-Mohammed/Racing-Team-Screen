@@ -8,6 +8,10 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from MediatorModule import Mediator
 
+
+smokeOffSrc = 'Images/smoke.png'
+smokeOnSrc = 'Images/smokeRed.png'
+
 class runApp(MDApp):
     Window.size = (1280, 720)
     screen_manager = ScreenManager(transition=SlideTransition(duration=1.5))
@@ -51,7 +55,7 @@ class runApp(MDApp):
 
     def changeGUItext(self,sensorName):
         try:
-            textInit = self.mediator.getSensor(f'{sensorName}') 
+            textInit = self.mediator.getAnalogueSensor(f'{sensorName}')
             temp =float(textInit)*100
             text = str(temp)
             text = f"{temp:.2f}"
@@ -59,19 +63,32 @@ class runApp(MDApp):
             print(f"Error:{e}")
 
         id = self.run_app_screen.ids[f"{sensorName}" + "ID"]
+        print(f"ID: {id}")
         id.text = text
 
-
-    def changeGUIicons(self,sensorName):
+    def changeGUIicons(self, sensorName):
         id = self.run_app_screen.ids[f"{sensorName}" + "ID"]
-        value = self.mediator.getSensor(f'{sensorName}')
-        print(f"Smoke Value:{value}")
-        onSrc=f'Images/{sensorName}Red.png'
-        offSrc =f'Images/{sensorName}.png'
-        if (value):
+        value = self.mediator.getDigitalSensor(f'{sensorName}')
+
+        # Ensure value is a boolean by converting from string
+        valueStr = str(value).strip().lower()  # Normalize the string for comparison
+        value = valueStr in ['true', '1', 'yes']  # Define the criteria for True
+
+        # Change the onsrc depending on if it is critical (red img) or reg (blue img)
+        onSrc = f"Images/{sensorName}Red.png"
+        offSrc = f'Images/{sensorName}.png'
+
+        print(f"ID: {id}. VALUE: {value} ({type(value)})")
+        print(f"ON SOURCE: {onSrc}")
+        print(f"OFF SOURCE: {offSrc}")
+
+        if value: #to check for the opp value write: if not value
+            print(f"SOURCE before change (True block): {id.source}")
             id.source = onSrc
+            print(f"SOURCE after change (True block): {id.source}")
         else:
             id.source = offSrc
+            print(f"SOURCE after change (False block): {id.source}")
 
     def updateText(self, dt):
         try:
@@ -80,11 +97,11 @@ class runApp(MDApp):
             print(f"Error:{e}. Couldn't get speed reading")
 
         try:
-            self.changeGUItext('temperature')
+            self.changeGUIicons('smoke')
         except Exception as e:
-            print(f"Error:{e}. Couldn't get temperature reading")
+            print(f"Error:{e}. Couldn't get smoke reading")
 
-        self.changeGUIicons('smoke')
+
     def stop(self):
         self.running = False  # Stop the infinite loop
 
