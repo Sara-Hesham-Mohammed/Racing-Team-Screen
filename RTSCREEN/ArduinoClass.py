@@ -1,18 +1,15 @@
 import time
 
 from pyfirmata import Arduino,util, ArduinoMega
-from multiprocessing import Queue
 
 class ArduinoClass:
 
     def __init__(self):
         self.iterationNum = 0
-        # initialize self.board and COM Number\
+        # initialize board and COM Number
         self.board = ArduinoMega('COM10')
 
         ########### DIGITAL PINS ##############
-        # initialize pins(digital/pwm/analogue) and if they're input or output
-
         # 0 and 1 digital pins are for RX TX, so we start from pin 2
         self.stWheel = self.board.get_pin('d:2:i')
 
@@ -21,11 +18,11 @@ class ArduinoClass:
 
         # lights
         self.highBeam = self.board.get_pin('d:7:i')
-
+        self.lowBeam = self.board.get_pin('d:8:i')
         self.leftBlinker = self.board.get_pin('d:3:i')
         self.rightBlinker = self.board.get_pin('d:4:i')
 
-        # lowBeam = self.board.get_pin('d:8:i')
+
 
         # doors / trunk / hood
         self.leftDoorSensor = self.board.get_pin('d:9:i')
@@ -49,12 +46,9 @@ class ArduinoClass:
         # Current and volt from battery and get power
         self.voltage = self.board.get_pin('a:5:i')  # initialized to random number for now
 
-        sensor = None
+        self.sensor = None
         it = util.Iterator(self.board)
         it.start()
-   
-    # starting iterator, necessary for analogue values?
-
 
 
     #sensor setter and getter for dynamic changes
@@ -78,6 +72,7 @@ class ArduinoClass:
 
     def getDigitalPinReading(self,sensorPIN):
         reading = self.board.digital[sensorPIN].read()
+        print(f"Digital Reading: {reading}")
         return reading
 
    #needs fixing and updating

@@ -8,10 +8,6 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from MediatorModule import Mediator
 
-
-smokeOffSrc = 'Images/smoke.png'
-smokeOnSrc = 'Images/smokeRed.png'
-
 class runApp(MDApp):
     Window.size = (1280, 720)
     screen_manager = ScreenManager(transition=SlideTransition(duration=1.5))
@@ -69,26 +65,19 @@ class runApp(MDApp):
     def changeGUIicons(self, sensorName):
         id = self.run_app_screen.ids[f"{sensorName}" + "ID"]
         value = self.mediator.getDigitalSensor(f'{sensorName}')
-
+        print(f"Value: {value}")
         # Ensure value is a boolean by converting from string
         valueStr = str(value).strip().lower()  # Normalize the string for comparison
-        value = valueStr in ['true', '1', 'yes']  # Define the criteria for True
+        value2 = valueStr in ['true', '1', 'yes']  # Define the criteria for True
 
         # Change the onsrc depending on if it is critical (red img) or reg (blue img)
         onSrc = f"Images/{sensorName}Red.png"
         offSrc = f'Images/{sensorName}.png'
 
-        print(f"ID: {id}. VALUE: {value} ({type(value)})")
-        print(f"ON SOURCE: {onSrc}")
-        print(f"OFF SOURCE: {offSrc}")
-
-        if value: #to check for the opp value write: if not value
-            print(f"SOURCE before change (True block): {id.source}")
+        if value2: #to check for the opp value write: if not value
             id.source = onSrc
-            print(f"SOURCE after change (True block): {id.source}")
         else:
             id.source = offSrc
-            print(f"SOURCE after change (False block): {id.source}")
 
     def updateText(self, dt):
         try:
