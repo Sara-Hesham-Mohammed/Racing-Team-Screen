@@ -1,52 +1,36 @@
 from kivy.properties import StringProperty, BooleanProperty, ListProperty, NumericProperty
-import Arduino
+from ArduinoClass import ArduinoClass
 
 
 
 class Mediator:
-    arduino = Arduino.Arduino()
-    doorOpen = False
-    trunkOpen = False
-    hoodOpen = False
-    isNightTime = False
-    sitting = False
-    seatBelt = False
-    highBeam = False
-    lowBeam = False
-    lowBattery = False
-    smoke = False
-    stWheel = False
-    LDR=0
-
-
+    arduino = ArduinoClass()
 
     def __init__(self):
-        self.speedStr = ''
-        self.voltsStr = ''
-        self.currentStr = ''
-        self.batteryStr = ''
-        self.distanceTravelledStr = ''
-        self.rangeLeftStr = ''
+        pass
 
-    def getSensor(self,sensorName):
-        sensor = getattr(self.arduino, sensorName, None)
-        PIN = self.arduino.getPIN(sensor)
+    def getSensorName(self,specificKey):
+        if specificKey in vars(self.arduino):
+            print(f"Sensor: {specificKey}")
+        else:
+            print(f"{specificKey} does not exist in the instance")
+
+        return specificKey
+
+    def getAnalogueSensor(self,sensorName):
+        sensorDetails =  getattr(self.arduino, sensorName, None)
+        PIN = self.arduino.getPIN(sensorDetails)
         sensorVal = self.arduino.getAnaloguePinReading(PIN)
         sensorStr = f"{sensorVal}"
-        print(f"Sensor:{sensor}. Sensor String:{sensorStr}. Sensor Value:{sensorVal}")
         return sensorStr
 
 
     def getDigitalSensor(self,sensorName):
-        sensor = getattr(self.arduino, sensorName, None)
-        print(sensor)
-        PIN = self.arduino.getPIN(sensor)
-        sensorVal = self.arduino.getAnalogueReading(PIN)
+        sensorDetails =  getattr(self.arduino, sensorName, None)
+        PIN = self.arduino.getPIN(sensorDetails)
+        sensorVal = self.arduino.getDigitalPinReading(PIN)
         sensorStr = f"{sensorVal}"
         return sensorStr
-
-    def getStWheel(self):
-        return self.stWheel
 
     def toggleLights(self):
         # just transform the pic, actual logic is in Arduino class

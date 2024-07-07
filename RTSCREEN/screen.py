@@ -64,7 +64,7 @@ class runApp(MDApp):
 
     def changeGUItext(self,sensorName):
         try:
-            textInit = self.mediator.getSensor(f'{sensorName}') 
+            textInit = self.mediator.getAnalogueSensor(f'{sensorName}')
             temp =float(textInit)*100
             text = str(temp)
             text = f"{temp:.2f}"
@@ -72,16 +72,22 @@ class runApp(MDApp):
             print(f"Error:{e}")
 
         id = self.run_app_screen.ids[f"{sensorName}" + "ID"]
+        print(f"ID: {id}")
         id.text = text
 
-
-    def changeGUIicons(self,sensorName):
+    def changeGUIicons(self, sensorName):
         id = self.run_app_screen.ids[f"{sensorName}" + "ID"]
-        value = self.mediator.getSensor(f'{sensorName}')
-        print(f"Smoke Value:{value}")
-        onSrc=f'Images/{sensorName}Red.png'
-        offSrc =f'Images/{sensorName}.png'
-        if (value):
+        value = self.mediator.getDigitalSensor(f'{sensorName}')
+        print(f"Value: {value}")
+        # Ensure value is a boolean by converting from string
+        valueStr = str(value).strip().lower()  # Normalize the string for comparison
+        value2 = valueStr in ['true', '1', 'yes']  # Define the criteria for True
+
+        # Change the onsrc depending on if it is critical (red img) or reg (blue img)
+        onSrc = f"Images/{sensorName}Red.png"
+        offSrc = f'Images/{sensorName}.png'
+
+        if value2: #to check for the opp value write: if not value
             id.source = onSrc
         else:
             id.source = offSrc
@@ -93,11 +99,11 @@ class runApp(MDApp):
             print(f"Error:{e}. Couldn't get speed reading")
 
         try:
-            self.changeGUItext('temperature')
+            self.changeGUIicons('smoke')
         except Exception as e:
-            print(f"Error:{e}. Couldn't get temperature reading")
+            print(f"Error:{e}. Couldn't get smoke reading")
 
-        self.changeGUIicons('smoke')
+
     def stop(self):
         self.running = False  # Stop the infinite loop
 
