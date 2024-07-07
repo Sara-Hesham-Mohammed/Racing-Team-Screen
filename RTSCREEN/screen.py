@@ -6,6 +6,7 @@ from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager, SlideTransition
 from kivy.clock import Clock
 from kivy.core.window import Window
+from circularprogressbar import CircularProgressBar 
 from MediatorModule import Mediator
 
 class runApp(MDApp):
@@ -39,6 +40,18 @@ class runApp(MDApp):
     def on_start(self):
         # Delay time for splash screen before transitioning to main screen
             Clock.schedule_once(self.change_screen, 12)
+            Clock.schedule_interval(self.update_progress, 0.1)
+        
+    def update_progress(self, dt):
+        progress1 = self.run_app_screen.ids.circular_progress1
+        progress2 = self.run_app_screen.ids.circular_progress2
+        if progress1.value < 100 or progress2.value < 100:
+            progress1.value += 1
+            progress2.value += 1
+        else:
+            progress1.value = 0
+            progress2.value = 0
+    
     def change_screen(self, dt):
         self.screen_manager.current = "runApp"
 

@@ -11,7 +11,22 @@ MDScreen:
             allow_stretch: True
             keep_ratio: True
 
-
+    MDFloatLayout:
+        CircularProgressBar:
+            id: circular_progress1
+            size_hint: None, None
+            size: dp(300), dp(300)
+            pos_hint: {'center_x': .19, 'center_y': .525}
+            line_width: dp(2)
+            color: [252/255, 15/255, 192/255, 1]  # Pink color in RGBA
+        CircularProgressBar:
+            id: circular_progress2
+            size_hint: None, None
+            size: dp(300), dp(300)
+            pos_hint: {'center_x': .815, 'center_y': .525}
+            line_width: dp(2)
+            color: [252/255, 15/255, 192/255, 1]  # Pink color in RGBA
+            
     MDFloatLayout:
 
         Image:
