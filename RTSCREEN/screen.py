@@ -1,6 +1,6 @@
 import time
+import threading
 from threading import Thread
-from multiprocessing import Process, Queue, Pool
 from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager, SlideTransition
@@ -23,6 +23,9 @@ class runApp(MDApp):
         self.StartArduinoThread()
         self.splash_screen = Builder.load_file("splashScreen.kv")
         self.run_app_screen = Builder.load_file("runApp.kv")
+
+        print(f"Active Thread Count: {threading.active_count()}")
+        print(f"Active Threads: {threading.enumerate()}")
 
     def build(self):
         self.title = "BUE RACING TEAM"
@@ -57,17 +60,23 @@ class runApp(MDApp):
 
     def StartArduinoThread(self):
         Thread(target=self.getArduinoValues).start()
+        #Thread(target=self.getSpeed()).start()
+
     def getArduinoValues(self):
         while self.running:
             Clock.schedule_once(self.updateText, 0)
             time.sleep(0.25)
 
+    def getSpeed(self):
+        return self.mediator.getCalculatedSensor('speed')
+
+    # gets ANALOG only, change to ask for analog or digital if needed
     def changeGUItext(self,sensorName):
         try:
-            textInit = self.mediator.getAnalogueSensor(f'{sensorName}')
-            temp =float(textInit)*100
-            text = str(temp)
-            text = f"{temp:.2f}"
+            reading = self.mediator.getAnalogueSensor(f'{sensorName}')#change this
+            transformedReading = self.mediator.transform(reading,100)
+            text = str(transformedReading)
+            text = f"{transformedReading:.2f}"
         except Exception as e:
             print(f"Error:{e}")
 
@@ -75,10 +84,10 @@ class runApp(MDApp):
         print(f"ID: {id}")
         id.text = text
 
+    #gets DIGITAL only, change to ask for analog or digital if needed
     def changeGUIicons(self, sensorName):
         id = self.run_app_screen.ids[f"{sensorName}" + "ID"]
         value = self.mediator.getDigitalSensor(f'{sensorName}')
-        print(f"Value: {value}")
         # Ensure value is a boolean by converting from string
         valueStr = str(value).strip().lower()  # Normalize the string for comparison
         value2 = valueStr in ['true', '1', 'yes']  # Define the criteria for True
@@ -93,21 +102,23 @@ class runApp(MDApp):
             id.source = offSrc
 
     def updateText(self, dt):
-        try:
-            self.changeGUItext('speed')
-        except Exception as e:
-            print(f"Error:{e}. Couldn't get speed reading")
+
 
         try:
             self.changeGUIicons('smoke')
         except Exception as e:
             print(f"Error:{e}. Couldn't get smoke reading")
 
+        try:
+            self.getSpeed()
+        except Exception as e:
+            print(f"Error:{e}. Couldn't get speed reading")
+
+
 
     def stop(self):
         self.running = False  # Stop the infinite loop
 
 if __name__ == '__main__':
-    with Pool(processes=4) as pool:
-        pass
+
     runApp().run()

@@ -1,3 +1,5 @@
+import time
+
 from kivy.properties import StringProperty, BooleanProperty, ListProperty, NumericProperty
 from ArduinoClass import ArduinoClass
 
@@ -29,6 +31,7 @@ class Mediator:
         sensorDetails =  getattr(self.arduino, sensorName, None)
         PIN = self.arduino.getPIN(sensorDetails)
         sensorVal = self.arduino.getDigitalPinReading(PIN)
+        print(f"Sensor: {sensorVal}")
         sensorStr = f"{sensorVal}"
         return sensorStr
 
@@ -42,5 +45,23 @@ class Mediator:
             isNighttime = BooleanProperty(False)
             isDaytime = BooleanProperty(True)
             # img src = sun
+
+    def transform(self,reading,correctionFactor):
+        transformedReading =float(reading)*correctionFactor
+        return transformedReading
+
+    def getCalculatedSensor(self,sensorName):
+        switch = {
+            'speed': self.arduino.getSpeed(),
+            'rangeLeft': self.arduino.getRangeLeft(),
+            'distanceTravelled': self.arduino.getDistanceTravelled(),
+            'batteryPercentage': self.arduino.getBatteryPercentage(),
+            'current':self.arduino.getCurrent(),
+            'voltage':self.arduino.getVoltage()
+        }
+        return switch[sensorName]
+
+
+
 
     #####################################################################################

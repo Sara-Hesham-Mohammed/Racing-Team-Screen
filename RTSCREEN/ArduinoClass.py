@@ -1,6 +1,6 @@
+import random
 import time
-
-from pyfirmata import Arduino,util, ArduinoMega
+from pyfirmata import ArduinoMega, util, Board
 
 class ArduinoClass:
 
@@ -22,8 +22,6 @@ class ArduinoClass:
         self.leftBlinker = self.board.get_pin('d:3:i')
         self.rightBlinker = self.board.get_pin('d:4:i')
 
-
-
         # doors / trunk / hood
         self.leftDoorSensor = self.board.get_pin('d:9:i')
         self.rightDoorSensor = self.board.get_pin('d:10:i')
@@ -36,7 +34,7 @@ class ArduinoClass:
         ########### ANALOGUE PINS, check if they all need to be input or output###############
         self.ldr = self.board.get_pin('a:0:i')
 
-        self.speed = self.board.get_pin('d:34:i')  # initialized to random number for now
+        self.speed = self.board.get_pin('a:1:i')  # initialized to random number for now
 
         self.temperature = self.board.get_pin('a:2:i')  # initialized to random number for now
 
@@ -47,11 +45,23 @@ class ArduinoClass:
         self.voltage = self.board.get_pin('a:5:i')  # initialized to random number for now
 
         self.sensor = None
+
+        #arduino mini layout
+        miniLayout = {
+            'digital': tuple(range(20)),  # Digital pins 0 to 19
+            'analog': tuple(range(6)),  # Analog pins 0 to 5
+            'pwm': (3, 5, 6, 9, 10, 11),  # PWM pins
+            'use_ports': True,  # If ports are used
+            'disabled': (0, 1),  # Disabled pins (usually RX and TX)]
+        }
+
+        #miniBoard = Board('COM10', layout=miniLayout) # to be used instead of mega board
+
         it = util.Iterator(self.board)
         it.start()
 
 
-    #sensor setter and getter for dynamic changes
+    #sensor setter and getter for dynamic changes [test here then move to sensors class and test]
     def setSensor(self,type,num,io):
         self.sensor = self.board.get_pin(f'{type}:{num}:{io}')
 
@@ -59,7 +69,7 @@ class ArduinoClass:
         return self.sensor
 
 
-    #Gets pin number
+    ################# Getters for pin num and readings ################
     def getPIN(self,sensor):
         sensorString = str(sensor)
         sensorPIN = sensorString[-1]
@@ -89,6 +99,12 @@ class ArduinoClass:
             # self.led.write(False)
             print("Light out, LED OFF")
     #Calculations => Speed and distance travelled
+
+    #for testing ONLYYY
+    def randomChoice(self):
+        return random.choice([0, 1])
+
+    ################# Speed Functions and calculations ################
     def pulseCount(self):
         count = 0
         interval = 2  # seconds
@@ -96,39 +112,66 @@ class ArduinoClass:
         startTime = time.time()
 
         while time.time() - startTime < interval:
-            pulse = self.getDigitalPinReading(self.getPIN(self.speed))
+            #pulse = self.getDigitalPinReading(self.getPIN(self.speed))
+            pulse = self.randomChoice()
             if (pulse == 1):
                 count += 1
 
             time.sleep(0.1)  # Sleep for a short duration to prevent a tight loop
 
-        return count
+        return {'count': count, 'startTime': startTime}
 
     def calcSpeed(self):
-        rpm = self.pulseCount()
+        pulseCountRes = self.pulseCount()
+        print(f"pulseCountRes: {pulseCountRes}")
+
+        count = pulseCountRes['count']  # Extract the count from the dictionary
+        print(f"Count: {count}")
+        rpm = pulseCountRes['count']
         r = 43.18 / 2
         speed = (2 * 3.142 * r / 60) * rpm
         return speed
 
+    def getSpeed(self):
+        return self.calcSpeed()
+
+    ################# Distance travelled ################
     def distanceTravelled(self):
-        rpm = self.pulseCount()
+        pulseCountRes = self.pulseCount()
+        rpm = pulseCountRes['count']
+        startTime = pulseCountRes['startTime']
         r = 43.18 / 2
         circumference = 2 * 3.142 * r
-        timePassed= time.time() # do the actual eqn
+        timePassed= time.time() - startTime # do the actual eqn
         distTrav = circumference*rpm*timePassed
         return distTrav
-    def getRangeLeft(self):
-        batteryCapacity = self.getBatteryCapacity()
-        # for now placeholder till a calc is given
-        return batteryCapacity
 
-    #battery capacity
-    def getBatteryCapacity(self):
+    def getDistanceTravelled(self):
+        return self.distanceTravelled()
+    ############# Range Left #############
+    def rangeLeft(self):
+        batteryPercentage = self.getBatteryPercentage()
+        # for now placeholder till a calc is given
+        return batteryPercentage
+
+    def getRangeLeft(self):
+        return self.rangeLeft()
+
+
+    ################ Battery Percentage ################
+    def getBatteryPercentage(self):
         # get curent, volt and power as well as the capacity and milage
         # the *100 is placeholder till get ac equation
         batteryPercent = self.getAnaloguePinReading(self.voltage)
         return batteryPercent
-    #power
+    ################ Power ################
     def getPower(self):
         self.power = self.current * self.voltage
         return self.power
+
+    def getCurrent(self):
+        #return vc.get_current()
+        return 0 # placeholder
+    def getVoltage(self):
+        return 0 # placeholder
+        #return vc.get_voltage()
