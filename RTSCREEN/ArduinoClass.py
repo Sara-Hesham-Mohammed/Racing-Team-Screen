@@ -1,11 +1,15 @@
 import random
 import time
-from pyfirmata import ArduinoMega, util, Board
+import threading
+from threading import Thread
+from pyfirmata import ArduinoMega, util, Board, ArduinoNano, Arduino
 
 class ArduinoClass:
 
     def __init__(self):
-        self.iterationNum = 0
+
+        priority: int
+        self.iterationNum = 0 #smth for LDR
         # initialize board and COM Number
         self.board = ArduinoMega('COM10')
 
@@ -17,10 +21,10 @@ class ArduinoClass:
         self.smoke = self.board.get_pin('d:6:i')
 
         # lights
-        self.highBeam = self.board.get_pin('d:7:i')
-        self.lowBeam = self.board.get_pin('d:8:i')
         self.leftBlinker = self.board.get_pin('d:3:i')
         self.rightBlinker = self.board.get_pin('d:4:i')
+        self.highBeam = self.board.get_pin('d:7:i')
+        self.lowBeam = self.board.get_pin('d:8:i')
 
         # doors / trunk / hood
         self.leftDoorSensor = self.board.get_pin('d:9:i')
@@ -34,7 +38,8 @@ class ArduinoClass:
         ########### ANALOGUE PINS, check if they all need to be input or output###############
         self.ldr = self.board.get_pin('a:0:i')
 
-        self.speed = self.board.get_pin('a:1:i')  # initialized to random number for now
+        #self.speed = self.board.get_pin('a:1:i')  # initialized to random number for now
+        self.speed = self.board.get_pin('d:31:i')  # initialized to random number for now
 
         self.temperature = self.board.get_pin('a:2:i')  # initialized to random number for now
 
@@ -60,6 +65,15 @@ class ArduinoClass:
         it = util.Iterator(self.board)
         it.start()
 
+        print(f"Active Thread Count: {threading.active_count()}")
+
+        try:
+            pulseCountThread =  threading.Thread(target=self.pulseCount, name="Pulse Count Thread")
+            pulseCountThread.daemon = True
+            pulseCountThread.start()
+
+        except Exception as e:
+            print(f"Could not start thread: {e}")
 
     #sensor setter and getter for dynamic changes [test here then move to sensors class and test]
     def setSensor(self,type,num,io):
@@ -70,6 +84,7 @@ class ArduinoClass:
 
 
     ################# Getters for pin num and readings ################
+    # PROBLEMonly gets the last digit of the pin
     def getPIN(self,sensor):
         sensorString = str(sensor)
         sensorPIN = sensorString[-1]
@@ -82,7 +97,7 @@ class ArduinoClass:
 
     def getDigitalPinReading(self,sensorPIN):
         reading = self.board.digital[sensorPIN].read()
-        print(f"Digital Reading: {reading}")
+        #print(f"Digital Reading: {reading}")
         return reading
 
    #needs fixing and updating
@@ -100,9 +115,6 @@ class ArduinoClass:
             print("Light out, LED OFF")
     #Calculations => Speed and distance travelled
 
-    #for testing ONLYYY
-    def randomChoice(self):
-        return random.choice([0, 1])
 
     ################# Speed Functions and calculations ################
     def pulseCount(self):
@@ -112,34 +124,27 @@ class ArduinoClass:
         startTime = time.time()
 
         while time.time() - startTime < interval:
-            #pulse = self.getDigitalPinReading(self.getPIN(self.speed))
-            pulse = self.randomChoice()
+            pulse = self.getDigitalPinReading(31)
             if (pulse == 1):
                 count += 1
-
-            time.sleep(0.1)  # Sleep for a short duration to prevent a tight loop
-
-        return {'count': count, 'startTime': startTime}
+# Sleep for a short duration to prevent a tight loop
+        time.sleep(0.1)
+        return count
 
     def calcSpeed(self):
         pulseCountRes = self.pulseCount()
         print(f"pulseCountRes: {pulseCountRes}")
-
-        count = pulseCountRes['count']  # Extract the count from the dictionary
-        print(f"Count: {count}")
-        rpm = pulseCountRes['count']
+  # Extract the count from the dictionary
+        rpm = pulseCountRes
         r = 43.18 / 2
-        speed = (2 * 3.142 * r / 60) * rpm
-        return speed
-
-    def getSpeed(self):
-        return self.calcSpeed()
+        calcSpeed = (2 * 3.142 * r / 60) * rpm
+        return calcSpeed
 
     ################# Distance travelled ################
     def distanceTravelled(self):
         pulseCountRes = self.pulseCount()
-        rpm = pulseCountRes['count']
-        startTime = pulseCountRes['startTime']
+        rpm = pulseCountRes
+        startTime = time.time()
         r = 43.18 / 2
         circumference = 2 * 3.142 * r
         timePassed= time.time() - startTime # do the actual eqn

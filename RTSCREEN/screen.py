@@ -1,6 +1,7 @@
 import time
 import threading
 from threading import Thread
+from concurrent.futures import ThreadPoolExecutor
 from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager, SlideTransition
@@ -20,11 +21,12 @@ class runApp(MDApp):
     def __init__(self, **kwargs):
         super(runApp, self).__init__(**kwargs)
         self.running = True  # Flag to control the loop
-        self.StartArduinoThread()
         self.splash_screen = Builder.load_file("splashScreen.kv")
         self.run_app_screen = Builder.load_file("runApp.kv")
+        Thread(target=self.getArduinoValues).start()
+        ThreadPoolExecutor()
 
-        print(f"Active Thread Count: {threading.active_count()}")
+
         print(f"Active Threads: {threading.enumerate()}")
 
     def build(self):
@@ -58,30 +60,23 @@ class runApp(MDApp):
     def change_screen(self, dt):
         self.screen_manager.current = "runApp"
 
-    def StartArduinoThread(self):
-        Thread(target=self.getArduinoValues).start()
-        #Thread(target=self.getSpeed()).start()
 
     def getArduinoValues(self):
         while self.running:
             Clock.schedule_once(self.updateText, 0)
             time.sleep(0.25)
 
-    def getSpeed(self):
-        return self.mediator.getCalculatedSensor('speed')
 
     # gets ANALOG only, change to ask for analog or digital if needed
     def changeGUItext(self,sensorName):
         try:
-            reading = self.mediator.getAnalogueSensor(f'{sensorName}')#change this
-            transformedReading = self.mediator.transform(reading,100)
-            text = str(transformedReading)
+            reading = self.mediator.getCalculatedReading("speed")
+            transformedReading = float(reading) /1000
             text = f"{transformedReading:.2f}"
         except Exception as e:
-            print(f"Error:{e}")
+            print(f"Error in change GUI text:{e}")
 
-        id = self.run_app_screen.ids[f"{sensorName}" + "ID"]
-        print(f"ID: {id}")
+        id = self.run_app_screen.ids[f"{sensorName}ID"]
         id.text = text
 
     #gets DIGITAL only, change to ask for analog or digital if needed
@@ -102,17 +97,18 @@ class runApp(MDApp):
             id.source = offSrc
 
     def updateText(self, dt):
-
-
         try:
             self.changeGUIicons('smoke')
         except Exception as e:
             print(f"Error:{e}. Couldn't get smoke reading")
 
         try:
-            self.getSpeed()
+            self.changeGUItext('speed')
         except Exception as e:
-            print(f"Error:{e}. Couldn't get speed reading")
+            print(f"Error in update text:{e}. Couldn't get speed reading")
+
+
+
 
 
 

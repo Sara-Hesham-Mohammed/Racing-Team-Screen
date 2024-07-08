@@ -33,6 +33,7 @@ class Mediator:
         sensorVal = self.arduino.getDigitalPinReading(PIN)
         print(f"Sensor: {sensorVal}")
         sensorStr = f"{sensorVal}"
+        self.arduino.calcSpeed()
         return sensorStr
 
     def toggleLights(self):
@@ -46,22 +47,18 @@ class Mediator:
             isDaytime = BooleanProperty(True)
             # img src = sun
 
-    def transform(self,reading,correctionFactor):
-        transformedReading =float(reading)*correctionFactor
-        return transformedReading
-
-    def getCalculatedSensor(self,sensorName):
-        switch = {
-            'speed': self.arduino.getSpeed(),
-            'rangeLeft': self.arduino.getRangeLeft(),
-            'distanceTravelled': self.arduino.getDistanceTravelled(),
-            'batteryPercentage': self.arduino.getBatteryPercentage(),
-            'current':self.arduino.getCurrent(),
-            'voltage':self.arduino.getVoltage()
-        }
-        return switch[sensorName]
-
-
-
-
     #####################################################################################
+    def getCalculatedReading(self,sensorName):
+        speed = self.arduino.calcSpeed()
+        distanceTravelled = self.arduino.getDistanceTravelled()
+        current = self.arduino.getCurrent()
+        voltage = self.arduino.getVoltage()
+
+        switch = {
+            "speed": speed,
+            "distanceTravelled": distanceTravelled,
+            "current": current,
+            "voltage": voltage
+        }
+
+        return switch[sensorName]
