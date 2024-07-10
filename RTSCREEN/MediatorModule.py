@@ -6,10 +6,10 @@ from ArduinoClass import ArduinoClass
 
 
 class Mediator:
-    arduino = ArduinoClass()
 
     def __init__(self):
-        pass
+        self.arduino = ArduinoClass()
+        self.arduinoList = []
 
     def getSensorName(self,specificKey):
         if specificKey in vars(self.arduino):
@@ -53,12 +53,20 @@ class Mediator:
         distanceTravelled = self.arduino.getDistanceTravelled()
         current = self.arduino.getCurrent()
         voltage = self.arduino.getVoltage()
+        batteryPercentage = self.arduino.getBatteryPercentage()
 
         switch = {
             "speed": speed,
             "distanceTravelled": distanceTravelled,
             "current": current,
-            "voltage": voltage
+            "voltage": voltage,
+            "batteryPercentage": batteryPercentage
         }
+        print(f"SWITCH CASE{switch[sensorName]}")
 
         return switch[sensorName]
+
+
+
+    def getVoltage(self):
+        return self.arduino.getVoltage()

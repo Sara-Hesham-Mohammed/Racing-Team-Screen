@@ -69,13 +69,9 @@ class runApp(MDApp):
 
     # gets ANALOG only, change to ask for analog or digital if needed
     def changeGUItext(self,sensorName):
-        try:
-            reading = self.mediator.getCalculatedReading("speed")
-            transformedReading = float(reading) /1000
-            text = f"{transformedReading:.2f}"
-        except Exception as e:
-            print(f"Error in change GUI text:{e}")
-
+        reading = self.mediator.getCalculatedReading(f"{sensorName}")
+        print(f"Voltage: {reading}")
+        text = f"{reading} V"
         id = self.run_app_screen.ids[f"{sensorName}ID"]
         id.text = text
 
@@ -101,11 +97,6 @@ class runApp(MDApp):
             self.changeGUIicons('smoke')
         except Exception as e:
             print(f"Error:{e}. Couldn't get smoke reading")
-
-        try:
-            self.changeGUItext('speed')
-        except Exception as e:
-            print(f"Error in update text:{e}. Couldn't get speed reading")
 
 
 

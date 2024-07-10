@@ -51,17 +51,6 @@ class ArduinoClass:
 
         self.sensor = None
 
-        #arduino mini layout
-        miniLayout = {
-            'digital': tuple(range(20)),  # Digital pins 0 to 19
-            'analog': tuple(range(6)),  # Analog pins 0 to 5
-            'pwm': (3, 5, 6, 9, 10, 11),  # PWM pins
-            'use_ports': True,  # If ports are used
-            'disabled': (0, 1),  # Disabled pins (usually RX and TX)]
-        }
-
-        #miniBoard = Board('COM10', layout=miniLayout) # to be used instead of mega board
-
         it = util.Iterator(self.board)
         it.start()
 
@@ -141,18 +130,16 @@ class ArduinoClass:
         return calcSpeed
 
     ################# Distance travelled ################
-    def distanceTravelled(self):
+
+    def getDistanceTravelled(self):
         pulseCountRes = self.pulseCount()
         rpm = pulseCountRes
         startTime = time.time()
         r = 43.18 / 2
         circumference = 2 * 3.142 * r
-        timePassed= time.time() - startTime # do the actual eqn
-        distTrav = circumference*rpm*timePassed
+        timePassed = time.time() - startTime  # do the actual eqn
+        distTrav = circumference * rpm * timePassed
         return distTrav
-
-    def getDistanceTravelled(self):
-        return self.distanceTravelled()
     ############# Range Left #############
     def rangeLeft(self):
         batteryPercentage = self.getBatteryPercentage()
@@ -165,18 +152,44 @@ class ArduinoClass:
 
     ################ Battery Percentage ################
     def getBatteryPercentage(self):
-        # get curent, volt and power as well as the capacity and milage
-        # the *100 is placeholder till get ac equation
-        batteryPercent = self.getAnaloguePinReading(self.voltage)
-        return batteryPercent
+        # each battery capacity 80 AH so 160 total
+        # ask how to get total V and the current capacity (or used capacity ay 7aga)
+        currentCapacity = None
+        fullCapacity = 160 # Ah (ampere hours)
+        totalVoltage = 56
+        remainingCapacity = fullCapacity - currentCapacity
+        voltage = self.getVoltage() # needs correction factor
+        totalEnergy = totalVoltage * fullCapacity
+        remainingEnergy = voltage * remainingCapacity #Wh (watt hours)
+        batteryPercent =(remainingEnergy / totalEnergy) * 100 # chat GPT's calc
+
+        batteryPercentage = (voltage/totalVoltage) * 100
+
+        return batteryPercent # OR batteryPercentage
     ################ Power ################
     def getPower(self):
-        self.power = self.current * self.voltage
+        current = self.getCurrent()
+        voltage = self.getVoltage()
+        self.power = current * voltage
         return self.power
 
     def getCurrent(self):
-        #return vc.get_current()
-        return 0 # placeholder
+        correctionFactor = None  # to be given later
+        pin = self.getPIN(self.current)
+        reading = self.getAnaloguePinReading(pin)
+        current = reading * correctionFactor
+        return current  # placeholder
+
+
+
+
     def getVoltage(self):
-        return 0 # placeholder
-        #return vc.get_voltage()
+        print("Getting Voltage.....")
+        correctionFactor = 65.625 # to be given later
+        pin = self.getPIN(self.voltage)
+        reading = self.getAnaloguePinReading(pin)
+        print(f"Voltage Reading: {reading}")
+        voltage = float(reading) * correctionFactor
+
+        print(f"Voltage: {voltage}")
+        return voltage

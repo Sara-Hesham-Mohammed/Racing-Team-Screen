@@ -4,9 +4,8 @@ from pyfirmata import Arduino,util, ArduinoMega, ArduinoNano
 class ArduinoClass:
     def __init__(self):
         self.comNum: int
-        self.board: object
-        it = util.Iterator(self.board)
-        it.start()
+        self.board = Arduino(None)
+
 
     def setBoard(self,comNum, type):
 
@@ -21,7 +20,14 @@ class ArduinoClass:
 
     def getBoard(self):
         return self.board
+    def startIterator(self):
+        if self.board is not None:
+            it = util.Iterator(self.board)
+            it.start()
 
+        else:
+            print("Board not set")
+            return
     def setComNum(self,comNum):
         self.comNum = comNum
 
