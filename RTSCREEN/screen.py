@@ -67,13 +67,6 @@ class runApp(MDApp):
 
     # gets ANALOG only, change to ask for analog or digital if needed
     def changeGUItext(self,sensorName):
-<<<<<<< Updated upstream
-        reading = self.mediator.getCalculatedReading(f"{sensorName}")
-        print(f"Voltage: {reading}")
-        text = f"{reading} V"
-        id = self.run_app_screen.ids[f"{sensorName}ID"]
-        id.text = text
-=======
         try:
             try:
                 reading = self.mediator.getCalculatedReading("speed")
@@ -86,7 +79,8 @@ class runApp(MDApp):
             id.text = text
         except Exception as e:
             print(f"Error in change GUI text:{e}")
->>>>>>> Stashed changes
+
+
 
     #gets DIGITAL only, change to ask for analog or digital if needed
     def changeGUIicons(self, sensorName):
@@ -111,14 +105,7 @@ class runApp(MDApp):
         except Exception as e:
             print(f"Error:{e}. Couldn't get smoke reading")
 
-<<<<<<< Updated upstream
-
-
-=======
         self.changeGUItext('speed')
->>>>>>> Stashed changes
-
-
 
     def stop(self):
         self.running = False  # Stop the infinite loop

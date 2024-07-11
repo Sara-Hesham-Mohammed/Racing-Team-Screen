@@ -53,14 +53,4 @@ class Mediator:
         }
         print(f"SWITCH CASE{switch[sensorName]}")
 
-<<<<<<< Updated upstream
         return switch[sensorName]
-
-
-
-    def getVoltage(self):
-        return self.arduino.getVoltage()
-=======
-        print(f"Calculated Sensor: {switch[sensorName]}")
-        return switch[sensorName]
->>>>>>> Stashed changes
