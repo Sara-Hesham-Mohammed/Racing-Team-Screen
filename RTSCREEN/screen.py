@@ -17,6 +17,7 @@ class runApp(MDApp):
     splash_screen = None
     run_app_screen = None
     mediator = Mediator()
+    executor = ThreadPoolExecutor(max_workers=8)
 
     def __init__(self, **kwargs):
         super(runApp, self).__init__(**kwargs)
@@ -44,6 +45,18 @@ class runApp(MDApp):
         # Delay time for splash screen before transitioning to main screen
             Clock.schedule_once(self.change_screen, 12)
             Clock.schedule_interval(self.update_progress, 0.1)
+        # Start Arduino value fetching thread
+            Thread(target=self.getArduinoValues, daemon=True).start()
+        # Start additional threads using ThreadPoolExecutor
+            self.executor.submit(self.mediator.getCalculatedReading, "speed")
+            self.executor.submit(self.mediator.getCalculatedReading, "distanceTravelled")
+            self.executor.submit(self.mediator.getCalculatedReading, "current")
+            self.executor.submit(self.mediator.getCalculatedReading, "voltage")
+            self.executor.submit(self.mediator.getCalculatedReading, "batteryPercentage")
+            self.executor.submit(self.mediator.getDigitalSensor, "temperature")
+            self.executor.submit(self.mediator.getAnalogueSensor, "seatSensor")
+            
+
         
     def update_progress(self, dt):
         progress1 = self.run_app_screen.ids.circular_progress1
