@@ -128,13 +128,10 @@ class ArduinoClass:
         distTrav = circumference * rpm * timePassed
         return distTrav
     ############# Range Left #############
-    def rangeLeft(self):
+    def getRangeLeft(self):
         batteryPercentage = self.getBatteryPercentage()
         # for now placeholder till a calc is given
         return batteryPercentage
-
-    def getRangeLeft(self):
-        return self.rangeLeft()
 
 
     ################ Battery Percentage ################
