@@ -12,6 +12,7 @@ class runApp(MDApp):
     Window.size = (1280, 720)
     screen_manager = ScreenManager(transition=SlideTransition(duration=1.5))
     mediator = Mediator()
+    previous_readings = {}
 
     def __init__(self, **kwargs):
         super(runApp, self).__init__(**kwargs)
@@ -31,7 +32,7 @@ class runApp(MDApp):
         Clock.schedule_once(self.change_screen, 3)
         Clock.schedule_interval(self.update_progress, 0.1)
         # Start updating Arduino values periodically
-        Clock.schedule_interval(self.update_arduino_values, 0.5)
+        Clock.schedule_interval(self.update_arduino_values, 1.5)  # Adjusted interval to 1 second
 
     def update_progress(self, dt):
         progress1 = self.run_app_screen.ids.circular_progress1
@@ -69,6 +70,9 @@ class runApp(MDApp):
             print(f"Error: {e}. Couldn't get smoke reading")
 
         for sensorName, reading in readings.items():
+            if sensorName in self.previous_readings and self.previous_readings[sensorName] == reading:
+                continue  # Skip updating if the reading hasn't changed
+            self.previous_readings[sensorName] = reading
             self.changeGUItext(sensorName, reading)
 
     def changeGUItext(self, sensorName, reading):
@@ -84,20 +88,21 @@ class runApp(MDApp):
             print(f"Error in change GUI text: {e}")
 
     def changeGUIicons(self, sensorName):
-        id = self.run_app_screen.ids[f"{sensorName}ID"]
-        value = self.mediator.getDigitalSensor(f'{sensorName}')
-        # Ensure value is a boolean by converting from string
-        valueStr = str(value).strip().lower()  # Normalize the string for comparison
-        value2 = valueStr in ['true', '1', 'yes']  # Define the criteria for True
+        try:
+            id = self.run_app_screen.ids[f"{sensorName}ID"]
+            value = self.mediator.getDigitalSensor(f'{sensorName}')
+            valueStr = str(value).strip().lower()  # Normalize the string for comparison
+            value2 = valueStr in ['true', '1', 'yes']  # Define the criteria for True
 
-        # Change the onsrc depending on if it is critical (red img) or reg (blue img)
-        onSrc = f"Images/{sensorName}Red.png"
-        offSrc = f'Images/{sensorName}.png'
+            onSrc = f"Images/{sensorName}Red.png"
+            offSrc = f'Images/{sensorName}.png'
 
-        if value2:  # to check for the opp value write: if not value
-            id.source = onSrc
-        else:
-            id.source = offSrc
+            if value2:  # to check for the opp value write: if not value
+                id.source = onSrc
+            else:
+                id.source = offSrc
+        except Exception as e:
+            print(f"Error in change GUI icons: {e}")
 
     def stop(self):
         self.running = False  # Stop the infinite loop
