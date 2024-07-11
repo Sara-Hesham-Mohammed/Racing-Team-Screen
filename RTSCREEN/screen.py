@@ -114,4 +114,11 @@ if __name__ == '__main__':
 
     #threadPool = ThreadPoolExecutor(8)
     #threadPool.submit(runApp.mediator.getCalculatedReading, "speed")
+    #threadPool.submit(runApp.mediator.getCalculatedReading, "distanceTravelled")
+    #threadPool.submit(runApp.mediator.getCalculatedReading, "current")
+    #threadPool.submit(runApp.mediator.getCalculatedReading, "voltage")
+    #threadPool.submit(runApp.mediator.getCalculatedReading, "batteryPercentage")
+    #threadPool.submit(runApp.mediator.getDigitalSensor, "temperature")
+    #threadPool.submit(runApp.mediator.getAnalogueSensor, "seatSensor")
+
     runApp().run()

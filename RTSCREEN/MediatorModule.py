@@ -1,9 +1,6 @@
 import time
-
 from kivy.properties import StringProperty, BooleanProperty, ListProperty, NumericProperty
 from ArduinoClass import ArduinoClass
-
-
 
 class Mediator:
 
