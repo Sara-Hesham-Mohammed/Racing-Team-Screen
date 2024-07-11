@@ -1,63 +1,38 @@
 import time
-import threading
-from threading import Thread
 from concurrent.futures import ThreadPoolExecutor
 from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager, SlideTransition
 from kivy.clock import Clock
 from kivy.core.window import Window
-from circularprogressbar import CircularProgressBar 
+from circularprogressbar import CircularProgressBar
 from MediatorModule import Mediator
 
 class runApp(MDApp):
     Window.size = (1280, 720)
     screen_manager = ScreenManager(transition=SlideTransition(duration=1.5))
-    # Load splashScreen.kv and runApp.kv files
-    splash_screen = None
-    run_app_screen = None
     mediator = Mediator()
-    executor = ThreadPoolExecutor(max_workers=8)
 
     def __init__(self, **kwargs):
         super(runApp, self).__init__(**kwargs)
         self.running = True  # Flag to control the loop
-        self.splash_screen = Builder.load_file("splashScreen.kv")
-        self.run_app_screen = Builder.load_file("runApp.kv")
-        Thread(target=self.getArduinoValues).start()
-
-        print(f"Active Threads: {threading.enumerate()}")
+        self.threadPool = ThreadPoolExecutor(8)
 
     def build(self):
         self.title = "BUE RACING TEAM"
-        self.screen_manager = ScreenManager(transition=SlideTransition(duration=4))
-
-        # Add screens to the screen manager
+        self.splash_screen = Builder.load_file("splashScreen.kv")
+        self.run_app_screen = Builder.load_file("runApp.kv")
         self.screen_manager.add_widget(self.splash_screen)
-
         self.screen_manager.add_widget(self.run_app_screen)
-
-        # Print screen names for debugging (optional)
-        print(self.screen_manager.screen_names)
-
         return self.screen_manager
+
     def on_start(self):
         # Delay time for splash screen before transitioning to main screen
-            Clock.schedule_once(self.change_screen, 12)
-            Clock.schedule_interval(self.update_progress, 0.1)
-        # Start Arduino value fetching thread
-            Thread(target=self.getArduinoValues, daemon=True).start()
-        # Start additional threads using ThreadPoolExecutor
-            self.executor.submit(self.mediator.getCalculatedReading, "speed")
-            self.executor.submit(self.mediator.getCalculatedReading, "distanceTravelled")
-            self.executor.submit(self.mediator.getCalculatedReading, "current")
-            self.executor.submit(self.mediator.getCalculatedReading, "voltage")
-            self.executor.submit(self.mediator.getCalculatedReading, "batteryPercentage")
-            self.executor.submit(self.mediator.getDigitalSensor, "temperature")
-            self.executor.submit(self.mediator.getAnalogueSensor, "seatSensor")
-            
+        Clock.schedule_once(self.change_screen, 3)
+        Clock.schedule_interval(self.update_progress, 0.1)
+        # Start updating Arduino values periodically
+        Clock.schedule_interval(self.update_arduino_values, 0.5)
 
-        
     def update_progress(self, dt):
         progress1 = self.run_app_screen.ids.circular_progress1
         progress2 = self.run_app_screen.ids.circular_progress2
@@ -67,37 +42,49 @@ class runApp(MDApp):
         else:
             progress1.value = 0
             progress2.value = 0
-    
+
     def change_screen(self, dt):
         self.screen_manager.current = "runApp"
 
+    def update_arduino_values(self, dt):
+        # Submit tasks to the thread pool to avoid blocking the main thread
+        self.threadPool.submit(self.getArduinoValues)
 
     def getArduinoValues(self):
-        while self.running:
-            Clock.schedule_once(self.updateText, 0)
-            time.sleep(0.25)
+        readings = {
+            "speed": self.mediator.getCalculatedReading("speed"),
+            "distanceTravelled": self.mediator.getCalculatedReading("distanceTravelled"),
+            "current": self.mediator.getCalculatedReading("current"),
+            "voltage": self.mediator.getCalculatedReading("voltage"),
+            "batteryPercentage": self.mediator.getCalculatedReading("batteryPercentage"),
+            "temperature": self.mediator.getDigitalSensor("temperature"),
+            "seatSensor": self.mediator.getAnalogueSensor("seatSensor")
+        }
+        Clock.schedule_once(lambda dt: self.updateText(readings), 0)
 
-
-    # gets ANALOG only, change to ask for analog or digital if needed
-    def changeGUItext(self,sensorName):
+    def updateText(self, readings):
         try:
-            try:
-                reading = self.mediator.getCalculatedReading("speed")
-                transformedReading = float(reading) /1000
-                text = f"{transformedReading:.2f}"
-            except Exception as e:
-                print(f"Error in change GUI text:{e}")
+            self.changeGUIicons('smoke')
+        except Exception as e:
+            print(f"Error: {e}. Couldn't get smoke reading")
 
+        for sensorName, reading in readings.items():
+            self.changeGUItext(sensorName, reading)
+
+    def changeGUItext(self, sensorName, reading):
+        try:
+            if sensorName == "speed":
+                transformedReading = float(reading) / 1000
+                text = f"{transformedReading:.2f}"
+            else:
+                text = str(reading)
             id = self.run_app_screen.ids[f"{sensorName}ID"]
             id.text = text
         except Exception as e:
-            print(f"Error in change GUI text:{e}")
+            print(f"Error in change GUI text: {e}")
 
-
-
-    #gets DIGITAL only, change to ask for analog or digital if needed
     def changeGUIicons(self, sensorName):
-        id = self.run_app_screen.ids[f"{sensorName}" + "ID"]
+        id = self.run_app_screen.ids[f"{sensorName}ID"]
         value = self.mediator.getDigitalSensor(f'{sensorName}')
         # Ensure value is a boolean by converting from string
         valueStr = str(value).strip().lower()  # Normalize the string for comparison
@@ -107,31 +94,14 @@ class runApp(MDApp):
         onSrc = f"Images/{sensorName}Red.png"
         offSrc = f'Images/{sensorName}.png'
 
-        if value2: #to check for the opp value write: if not value
+        if value2:  # to check for the opp value write: if not value
             id.source = onSrc
         else:
             id.source = offSrc
 
-    def updateText(self, dt):
-        try:
-            self.changeGUIicons('smoke')
-        except Exception as e:
-            print(f"Error:{e}. Couldn't get smoke reading")
-
-        self.changeGUItext('speed')
-
     def stop(self):
         self.running = False  # Stop the infinite loop
+        self.threadPool.shutdown(wait=True)  # Shutdown the thread pool
 
 if __name__ == '__main__':
-
-    #threadPool = ThreadPoolExecutor(8)
-    #threadPool.submit(runApp.mediator.getCalculatedReading, "speed")
-    #threadPool.submit(runApp.mediator.getCalculatedReading, "distanceTravelled")
-    #threadPool.submit(runApp.mediator.getCalculatedReading, "current")
-    #threadPool.submit(runApp.mediator.getCalculatedReading, "voltage")
-    #threadPool.submit(runApp.mediator.getCalculatedReading, "batteryPercentage")
-    #threadPool.submit(runApp.mediator.getDigitalSensor, "temperature")
-    #threadPool.submit(runApp.mediator.getAnalogueSensor, "seatSensor")
-
     runApp().run()
