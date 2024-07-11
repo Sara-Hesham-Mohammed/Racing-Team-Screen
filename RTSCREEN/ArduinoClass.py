@@ -138,7 +138,7 @@ class ArduinoClass:
     def getBatteryPercentage(self):
         # each battery capacity 80 AH so 160 total
         # ask how to get total V and the current capacity (or used capacity ay 7aga)
-        currentCapacity = None
+        currentCapacity = 1
         fullCapacity = 160 # Ah (ampere hours)
         totalVoltage = 56
         remainingCapacity = fullCapacity - currentCapacity
@@ -149,7 +149,7 @@ class ArduinoClass:
 
         batteryPercentage = (voltage/totalVoltage) * 100
 
-        return batteryPercent # OR batteryPercentage
+        return batteryPercentage # OR batteryPercentage
     ################ Power ################
     def getPower(self):
         current = self.getCurrent()
@@ -158,7 +158,7 @@ class ArduinoClass:
         return self.power
 
     def getCurrent(self):
-        correctionFactor = None  # to be given later
+        correctionFactor = 1  # to be given later
         pin = self.getPIN(self.current)
         reading = self.getAnaloguePinReading(pin)
         current = reading * correctionFactor

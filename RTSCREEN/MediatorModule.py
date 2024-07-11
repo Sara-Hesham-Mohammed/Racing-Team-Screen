@@ -11,13 +11,13 @@ class Mediator:
         self.arduino = ArduinoClass()
         self.arduinoList = []
 
-    def getSensorName(self,specificKey):
-        if specificKey in vars(self.arduino):
-            print(f"Sensor: {specificKey}")
+    def getSensorName(self,name):
+        if name in vars(self.arduino):
+            print(f"Sensor: {name}")
         else:
-            print(f"{specificKey} does not exist in the instance")
+            print(f"{name} does not exist in the instance")
 
-        return specificKey
+        return name
 
     def getAnalogueSensor(self,sensorName):
         sensorDetails =  getattr(self.arduino, sensorName, None)
