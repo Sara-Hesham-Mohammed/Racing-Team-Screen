@@ -24,8 +24,6 @@ class runApp(MDApp):
         self.splash_screen = Builder.load_file("splashScreen.kv")
         self.run_app_screen = Builder.load_file("runApp.kv")
         Thread(target=self.getArduinoValues).start()
-        ThreadPoolExecutor()
-
 
         print(f"Active Threads: {threading.enumerate()}")
 
@@ -69,11 +67,26 @@ class runApp(MDApp):
 
     # gets ANALOG only, change to ask for analog or digital if needed
     def changeGUItext(self,sensorName):
+<<<<<<< Updated upstream
         reading = self.mediator.getCalculatedReading(f"{sensorName}")
         print(f"Voltage: {reading}")
         text = f"{reading} V"
         id = self.run_app_screen.ids[f"{sensorName}ID"]
         id.text = text
+=======
+        try:
+            try:
+                reading = self.mediator.getCalculatedReading("speed")
+                transformedReading = float(reading) /1000
+                text = f"{transformedReading:.2f}"
+            except Exception as e:
+                print(f"Error in change GUI text:{e}")
+
+            id = self.run_app_screen.ids[f"{sensorName}ID"]
+            id.text = text
+        except Exception as e:
+            print(f"Error in change GUI text:{e}")
+>>>>>>> Stashed changes
 
     #gets DIGITAL only, change to ask for analog or digital if needed
     def changeGUIicons(self, sensorName):
@@ -98,8 +111,12 @@ class runApp(MDApp):
         except Exception as e:
             print(f"Error:{e}. Couldn't get smoke reading")
 
+<<<<<<< Updated upstream
 
 
+=======
+        self.changeGUItext('speed')
+>>>>>>> Stashed changes
 
 
 
@@ -108,4 +125,6 @@ class runApp(MDApp):
 
 if __name__ == '__main__':
 
+    #threadPool = ThreadPoolExecutor(8)
+    #threadPool.submit(runApp.mediator.getCalculatedReading, "speed")
     runApp().run()

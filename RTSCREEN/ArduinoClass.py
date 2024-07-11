@@ -89,22 +89,9 @@ class ArduinoClass:
         #print(f"Digital Reading: {reading}")
         return reading
 
-   #needs fixing and updating
-    def getLDR(self):
-        ldrValue = self.getAnaloguePinReading(self.getPIN(self.ldr)) * 1023  # intensity
 
-        print(f"LDR Intensity: {ldrValue}")
-        if ldrValue > 100:  # closer to 1023 is darkness
-            print("Dark out, LED ON")
-            # self.led.write(True)
-            self.iterationNum += 1
-            print(f"Iteration Num:{self.iterationNum}")  # just for debugging
-        else:  # closer to 0 is light outside
-            # self.led.write(False)
-            print("Light out, LED OFF")
+
     #Calculations => Speed and distance travelled
-
-
     ################# Speed Functions and calculations ################
     def pulseCount(self):
         count = 0

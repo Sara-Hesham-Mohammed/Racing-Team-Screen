@@ -36,17 +36,6 @@ class Mediator:
         self.arduino.calcSpeed()
         return sensorStr
 
-    def toggleLights(self):
-        # just transform the pic, actual logic is in Arduino class
-        if self.LDR > 70:
-            isNighttime = BooleanProperty(True)
-            isDaytime = BooleanProperty(False)
-            # img src = moon
-        else:
-            isNighttime = BooleanProperty(False)
-            isDaytime = BooleanProperty(True)
-            # img src = sun
-
     #####################################################################################
     def getCalculatedReading(self,sensorName):
         speed = self.arduino.calcSpeed()
@@ -64,9 +53,14 @@ class Mediator:
         }
         print(f"SWITCH CASE{switch[sensorName]}")
 
+<<<<<<< Updated upstream
         return switch[sensorName]
 
 
 
     def getVoltage(self):
         return self.arduino.getVoltage()
+=======
+        print(f"Calculated Sensor: {switch[sensorName]}")
+        return switch[sensorName]
+>>>>>>> Stashed changes
